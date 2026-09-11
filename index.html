@@ -565,14 +565,6 @@ I'm a woman who easily cries. If one day I accidentally make you angry, please d
     <button class="fx-close" id="fsClose">close, but keep this in your heart</button>
   </div>
 </div>
-
-<!-- music -->
-<audio id="bgAudio" loop preload="none">
-  <source src=""Audios\song.mpeg"song.mpeg" type="audio/mpeg">
-</audio>
-<div id="musicHint">turn sound on 🎵</div>
-<button id="musicToggle" aria-label="Play music">🖤</button>
-
 <script>
 /* =========================================================
    EDIT YOUR CONTENT HERE
@@ -781,39 +773,6 @@ document.getElementById('finaleBtn').addEventListener('click', ()=>{
 document.getElementById('fsClose').addEventListener('click', ()=>{
   document.getElementById('fsFinale').classList.remove('open');
 });
-
-/* =========================================================
-   BACKGROUND MUSIC
-   ========================================================= */
-const audio = document.getElementById('bgAudio');
-const musicToggle = document.getElementById('musicToggle');
-const musicHint = document.getElementById('musicHint');
-let musicReady = false;
-let musicPlaying = false;
-
-audio.addEventListener('canplaythrough', ()=>{
-  if(!musicReady){
-    musicReady = true;
-    musicToggle.classList.add('ready');
-    musicHint.classList.add('show');
-    setTimeout(()=> musicHint.classList.remove('show'), 4500);
-  }
-});
-audio.addEventListener('error', ()=>{ /* no song.mp3 provided yet: stay hidden, no error shown */ });
-audio.load();
-
-musicToggle.addEventListener('click', ()=>{
-  if(musicPlaying){
-    audio.pause();
-    musicToggle.textContent = '▶';
-  } else {
-    audio.play().catch(()=>{});
-    musicToggle.textContent = '❚❚';
-  }
-  musicPlaying = !musicPlaying;
-  musicHint.classList.remove('show');
-});
-
 /* =========================================================
    FLOATING HEARTS (ambient background)
    ========================================================= */
