@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Birthday Wishes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Cormorant+Garamond:wght@400;500;600&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
+
+<!--
+  ============================================================
+  HOW TO EDIT THIS SITE (read me!)
+  ============================================================
+  1) PHOTOS
+     - Put your photos in a folder named "photos" right next to
+       this file, e.g.  /photos/us-meeting.jpg
+     - Then just change the file names inside the JS arrays
+       below (search for "TIMELINE DATA" and "GALLERY DATA").
+     - Until a photo is added, a soft placeholder frame with a
+       little heart will show automatically — nothing breaks.
+
+  2) TEXT
+     - Search for "TIMELINE DATA", "GALLERY DATA" and
+       "REASONS DATA" below and edit the words between quotes.
+     - The love letter text is further down, inside the
+       <section id="letter"> in the HTML body.
+
+  3) MUSIC
+     - Put a song file named "song.mp3" in the same folder as
+       this HTML file (next to "photos"). It will appear as a
+       small play button automatically. If it's missing, the
+       button just stays quietly hidden.
+  ============================================================
+-->
+
+<style>
+  :root{
+    --cream:#FAF6EC;
+    --paper:#FFFDF7;
+    --blush:#E6DBF0;
+    --rose:#8B5FA8;
+    --burgundy:#6B3FA0;
+    --burgundy-deep:#3D1F5C;
+    --gold:#C9A961;
+    --ink:#2E2135;
+    --ink-soft:#7A5A93;
+    --shadow: 0 18px 40px rgba(61,31,92,0.16);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    margin:0;
+    background: linear-gradient(180deg, var(--cream) 0%, #EFE3F5 55%, var(--cream) 100%);
+    color:var(--ink);
+    font-family:'Cormorant Garamond', serif;
+    font-size:19px;
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3{ font-family:'Playfair Display', serif; margin:0; }
+  .script{ font-family:'Dancing Script', cursive; }
+
+  ::selection{ background:var(--blush); color:var(--burgundy-deep); }
+
+  /* respect reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+
+  a, button{ font-family:inherit; }
+
+  /* ---------- floating hearts background canvas ---------- */
+  #heartsCanvas{
+    position:fixed; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:1; opacity:0.55;
+  }
+
+  /* ---------- confetti canvas (burst) ---------- */
+  #confettiCanvas{
+    position:fixed; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:60;
+  }
+
+  /* ---------- sections generic ---------- */
+  section{
+    position:relative; z-index:2;
+    padding:88px 22px;
+    max-width:640px;
+    margin:0 auto;
+  }
+
+  .reveal{
+    opacity:0; transform:translateY(28px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+  .eyebrow-heart{
+    font-size:26px; display:block; margin-bottom:10px;
+  }
+
+  .section-title{
+    font-size:clamp(28px,7vw,40px);
+    color:var(--burgundy-deep);
+    text-align:center;
+    font-style:italic;
+    font-weight:600;
+    margin-bottom:14px;
+  }
+
+  .section-sub{
+    text-align:center; color:var(--ink-soft);
+    max-width:420px; margin:0 auto 48px; font-size:19px;
+  }
+  #memories .section-sub{ font-weight:600; color:#3D1F5C; }
+
+  /* ================= HERO ================= */
+  #hero{
+    min-height:100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:40px 24px; position:relative; z-index:2;
+    background:#9a4490;
+  }
+  .hero-frame{
+    border:1px solid rgba(201,169,97,0.55);
+    border-radius:2px;
+    padding:44px 26px;
+    background:rgba(255,251,246,0.55);
+    backdrop-filter:blur(2px);
+    max-width:460px;
+  }
+  .hero-kicker{
+    letter-spacing:0.14em; color:#000; font-size:15px;
+    font-family:'Cormorant Garamond',serif; margin-bottom:18px;
+  }
+  .hero-title{
+    font-size:clamp(34px,9vw,54px);
+    color:var(--burgundy-deep);
+    font-style:italic;
+    line-height:1.15;
+    margin-bottom:18px;
+  }
+  .hero-title .amp{ color:var(--gold); }
+  .hero-sub{
+    font-size:20px; color:var(--ink-soft); margin-bottom:34px;
+    font-family:'Dancing Script',cursive; font-size:26px;
+  }
+
+  .surprise-btn{
+    position:relative;
+    border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-deep) 100%);
+    color:#FBF3EA;
+    padding:17px 34px;
+    border-radius:40px;
+    font-size:18px;
+    letter-spacing:0.02em;
+    box-shadow: 0 12px 26px rgba(107,63,160,0.35);
+    animation: pulseBtn 2.4s ease-in-out infinite;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .surprise-btn:hover{ transform:translateY(-2px) scale(1.03); box-shadow:0 16px 32px rgba(107,63,160,0.42); }
+  .surprise-btn:active{ transform:translateY(0) scale(0.98); }
+  @keyframes pulseBtn{
+    0%,100%{ box-shadow:0 12px 26px rgba(107,63,160,0.35); }
+    50%{ box-shadow:0 14px 34px rgba(107,63,160,0.5), 0 0 0 8px rgba(201,169,97,0.12); }
+  }
+
+  .scroll-hint{
+    margin-top:26px; font-size:14px; color:#1A0F26; opacity:0.85; font-weight:700;
+  }
+
+  /* hide everything after hero until opened */
+  #story{
+    display:none;
+  }
+  #story.show{ display:block; }
+
+  /* ================= TIMELINE ================= */
+  .timeline{
+    position:relative;
+    margin-top:10px;
+  }
+  .timeline::before{
+    content:"";
+    position:absolute; left:20px; top:6px; bottom:6px; width:1px;
+    background:linear-gradient(180deg, transparent, var(--gold) 8%, var(--gold) 92%, transparent);
+    opacity:0.55;
+  }
+  @media(min-width:720px){
+    .timeline::before{ left:50%; transform:translateX(-50%); }
+  }
+
+  .tl-item{
+    position:relative;
+    padding-left:52px;
+    margin-bottom:46px;
+  }
+  .tl-item:last-child{ margin-bottom:0; }
+  .tl-dot{
+    position:absolute; left:11px; top:4px;
+    width:19px; height:19px; border-radius:50%;
+    background:var(--paper);
+    border:2px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px;
+  }
+  @media(min-width:720px){
+    .tl-item{ width:46%; padding-left:0; padding-right:0; }
+    .tl-item:nth-child(odd){ margin-left:0; text-align:right; padding-right:52px; }
+    .tl-item:nth-child(even){ margin-left:54%; padding-left:52px; }
+    .tl-dot{ left:auto; }
+    .tl-item:nth-child(odd) .tl-dot{ right:-46px; left:auto; }
+    .tl-item:nth-child(even) .tl-dot{ left:-46px; }
+  }
+
+  .tl-date{
+    font-family:'Dancing Script',cursive; color:var(--rose); font-size:23px; display:block; margin-bottom:4px;
+  }
+  .tl-card{
+    background:var(--paper);
+    border-radius:6px;
+    padding:18px 20px;
+    box-shadow:var(--shadow);
+    border:1px solid rgba(198,161,91,0.18);
+  }
+  .tl-card h3{ color:var(--burgundy-deep); font-size:21px; font-style:italic; margin-bottom:6px; }
+  .tl-card p{ margin:0 0 12px; color:#000; font-size:17px; }
+  .frame{
+  display:block; width:100%; aspect-ratio:4/3; border-radius:4px;
+  overflow:hidden; position:relative;
+  border:6px solid var(--paper);
+  outline:1px solid rgba(201,169,97,0.4);
+  box-shadow:0 6px 18px rgba(61,31,92,0.14);
+  background:linear-gradient(135deg,#EFE3F5,#DFCBEC);
+}
+.frame img{ width:100%; height:100%; object-fit:contain; display:block; background:linear-gradient(135deg,#EFE3F5,#DFCBEC); }
+  .frame .ph{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:6px; color:var(--rose); font-size:14px; text-align:center; padding:10px;
+  }
+  .frame .ph span.big{ font-size:26px; }
+
+  /* ================= GALLERY ================= */
+  .gallery-grid{
+    color:#101010;display:grid; grid-template-columns:repeat(2,1fr); gap:14px;
+  }
+  @media(min-width:560px){ .gallery-grid{ grid-template-columns:repeat(3,1fr); } }
+
+  .g-item{
+    cursor:pointer; border:none; padding:0; background:none;
+    border-radius:5px; overflow:hidden; position:relative;
+    aspect-ratio:1/1;
+    box-shadow:var(--shadow);
+    transition:transform 0.35s ease;
+  }
+  .g-item:hover{ transform:translateY(-4px) rotate(-0.4deg); }
+  .g-item img{ width:100%; height:100%; object-fit:contain; display:block; }
+  .g-item .ph{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#eceaed,#DCC8ED); color:var(--rose); font-size:22px;
+  }
+  .g-item .g-cap{
+    position:absolute; left:0; right:0; bottom:0;
+    padding:8px 10px 6px;
+    background:linear-gradient(0deg, rgba(61,31,92,0.7), transparent);
+    color:#aaa5a5; font-size:13px; text-align:left; opacity:0; transition:opacity 0.3s ease;
+  }
+  .g-item:hover .g-cap, .g-item:focus-visible .g-cap{ opacity:1; }
+
+  .lightbox{
+    position:fixed; inset:0; z-index:80; background:rgba(37,18,54,0.88);
+    display:none; align-items:center; justify-content:center; padding:26px;
+    backdrop-filter:blur(3px);
+  }
+  .lightbox.open{ display:flex; }
+  .lightbox-inner{
+    background:var(--paper); border-radius:8px; overflow:hidden; max-width:520px; width:100%;
+    box-shadow:0 30px 60px rgba(0,0,0,0.4);
+    animation:lbIn 0.35s ease;
+  }
+  @keyframes lbIn{ from{ opacity:0; transform:scale(0.94); } to{ opacity:1; transform:scale(1);} }
+  .lightbox-img{ width:100%; aspect-ratio:4/3; object-fit:cover; display:block; background:linear-gradient(135deg,#EFE3F5,#DCC8ED); }
+  .lightbox-cap{ padding:18px 22px 22px; text-align:center; color:#000; font-size:19px; font-style:italic; }
+  .lightbox-close{
+    position:absolute; top:18px; right:18px; width:40px; height:40px; border-radius:50%;
+    background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.4); color:#fff;
+    font-size:20px; cursor:pointer; line-height:1;
+  }
+
+  /* ================= REASONS ================= */
+  .hearts-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:16px;
+  }
+  @media(min-width:560px){ .hearts-grid{ grid-template-columns:repeat(3,1fr); } }
+
+  .heart-card{
+    perspective:1000px; aspect-ratio:1/0.95; cursor:pointer;
+  }
+  .heart-inner{
+    position:relative; width:100%; height:100%;
+    transform-style:preserve-3d; transition:transform 0.6s cubic-bezier(.4,.2,.2,1);
+  }
+  .heart-card.flipped .heart-inner{ transform:rotateY(180deg); }
+
+  .heart-face{
+    position:absolute; inset:0; backface-visibility:hidden;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    border-radius:16px 16px 50px 50px / 16px 16px 60px 60px;
+    padding:14px;
+  }
+  .heart-front{
+    background:linear-gradient(150deg, var(--rose), var(--burgundy));
+    color:#fff; font-size:15px; box-shadow:0 10px 22px rgba(107,63,160,0.3);
+  }
+  .heart-front .num{ position:absolute; top:12px; left:14px; font-size:11px; opacity:0.7; font-family:'Cormorant Garamond',serif; }
+  .heart-front .icon{ font-size:30px; }
+  .heart-back{
+    background:var(--paper); border:1px solid var(--gold);
+    color:var(--burgundy-deep); font-size:14.5px; transform:rotateY(180deg);
+    font-style:italic; line-height:1.35;
+    box-shadow:0 10px 22px rgba(107,63,160,0.16);
+  }
+
+  /* ================= LETTER ================= */
+  .letter-paper{
+    background:var(--paper);
+    border-radius:4px;
+    padding:38px 26px 30px;
+    box-shadow:var(--shadow);
+    position:relative;
+    border:1px solid rgba(198,161,91,0.3);
+  }
+  .letter-paper::before{
+    content:"";
+    position:absolute; left:0; right:0; top:0; height:5px;
+    background:linear-gradient(90deg, var(--gold), var(--rose), var(--gold));
+    border-radius:4px 4px 0 0;
+  }
+  .letter-text{
+    font-family:"Times New Roman";
+    font-size:15px;
+    line-height:1.55;
+    color:var(--burgundy-deep);
+    white-space:pre-line;
+  }
+  .letter-sign{
+    font-family:"Times New Roman";
+    text-align:right; 
+    margin-top:18px; font-size:20px; color:var(--rose);
+  }
+
+  /* ================= FINAL SURPRISE ================= */
+  #finale{ text-align:center; }
+  .finale-btn{
+    margin-top:8px;
+    border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--gold), #a97f3b);
+    color:#3A2430; font-weight:600;
+    padding:16px 30px; border-radius:40px; font-size:17px;
+    box-shadow:0 12px 24px rgba(201,169,97,0.4);
+    transition: transform 0.25s ease;
+  }
+  .finale-btn:hover{ transform:translateY(-2px) scale(1.03); }
+
+  .fullscreen-finale{
+    position:fixed; inset:0; z-index:90; display:none;
+    align-items:center; justify-content:center; text-align:center; padding:30px;
+    background:radial-gradient(ellipse at center, #6B3FA0 0%, #3D1F5C 70%, #1C0F2E 100%);
+  }
+  .fullscreen-finale.open{ display:flex; }
+  .fullscreen-finale .fx-inner{
+    max-width:480px; color:#FBF3EA;
+    animation:finalePop 1s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes finalePop{ from{ opacity:0; transform:scale(0.85);} to{ opacity:1; transform:scale(1);} }
+  .fx-inner .script{ font-size:clamp(28px,7vw,40px); color:#F6E3C6; display:block; margin-bottom:20px; line-height:1.3; }
+  .fx-frame{
+    width:100%; max-width:150px; aspect-ratio:9/16; margin:0 auto 16px;
+    border-radius:8px; overflow:hidden; position:relative;
+    background:linear-gradient(135deg,#7a4fae,#4a2a75);
+  }
+  .fx-frame img{width:100%; height:100%; object-fit:cover; display:block; }
+  .fx-ph{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:6px; color:#F0E4F7; font-size:13px; text-align:center; padding:10px;
+  }
+  .fx-ph span.big{ font-size:24px; }
+  .fx-inner .small{ font-size:18px; color:#E9DAF0; margin-bottom:8px; }
+  .fx-close{
+    margin-top:30px; background:none; border:1px solid rgba(255,255,255,0.5); color:#fff;
+    padding:10px 22px; border-radius:30px; cursor:pointer; font-size:15px;
+  }
+
+  footer{
+    text-align:center; padding:40px 20px 60px; color:var(--rose); font-size:15px; position:relative; z-index:2;
+  }
+
+  /* ---------- music toggle ---------- */
+  #musicToggle{
+    position:fixed; right:16px; bottom:16px; z-index:70;
+    width:52px; height:52px; border-radius:50%;
+    background:var(--paper); border:1px solid rgba(201,169,97,0.5);
+    box-shadow:var(--shadow); cursor:pointer; font-size:20px;
+    display:none; align-items:center; justify-content:center;
+  }
+  #musicToggle.ready{ display:flex; }
+  #musicHint{
+    position:fixed; right:16px; bottom:74px; z-index:70;
+    background:var(--burgundy-deep); color:#fff; font-size:12.5px;
+    padding:7px 12px; border-radius:20px; opacity:0; pointer-events:none;
+    transition:opacity 0.4s ease;
+    white-space:nowrap;
+  }
+  #musicHint.show{ opacity:1; }
+
+
+  /* ================= PIN GATE ================= */
+  #pinGate{
+    position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
+    padding:24px; background:radial-gradient(circle at top,#6B3FA0 0%,#3D1F5C 58%,#1C0F2E 100%);
+  }
+  .pin-card{
+    width:min(92vw,420px); background:var(--paper); border:1px solid rgba(201,169,97,.55);
+    border-radius:18px; padding:30px 24px; text-align:center; box-shadow:0 28px 70px rgba(0,0,0,.35);
+  }
+  .pin-card h2{ color:var(--burgundy-deep); margin-bottom:8px; font-style:italic; }
+  .pin-card p{ color:var(--ink-soft); margin:0 0 18px; }
+  #pinInput{ width:100%; padding:14px 16px; border:1px solid #d9c9e4; border-radius:12px; font-size:20px; text-align:center; letter-spacing:.28em; outline:none; }
+  #pinInput:focus{ border-color:var(--rose); box-shadow:0 0 0 4px rgba(139,95,168,.10); }
+  .pin-submit{ margin-top:14px; width:100%; border:none; border-radius:28px; padding:13px 18px; cursor:pointer; background:linear-gradient(135deg,var(--burgundy),var(--burgundy-deep)); color:#fff; font-size:17px; }
+  #pinError{ min-height:22px; margin-top:10px; color:#8a2f58; font-size:15px; }
+
+  /* ================= TOGETHER COUNTER ================= */
+  .counter-card{ background:#9CAF88; border:1px solid rgba(201,169,97,.32); border-radius:18px; padding:24px 20px; box-shadow:var(--shadow); text-align:center; }
+  .counter-card .counter-number{ color:#1A0F26; }
+  .counter-card .counter-label{ color:#2E2135; }
+  .counter-card .counter-detail{ color:#2E2135; }
+  .counter-number{ font-family:'Playfair Display',serif; color:var(--burgundy-deep); font-size:clamp(44px,12vw,72px); line-height:1; }
+  .counter-label{ color:var(--rose); margin-top:6px; font-size:19px; }
+  .counter-detail{ margin-top:12px; color:var(--ink-soft); font-size:16px; }
+
+  input, textarea{ font-family:'Cormorant Garamond',serif; }
+</style>
+</head>
+<body>
+<!-- ================= PIN GATE ================= -->
+<div id="pinGate">
+  <div class="pin-card">
+    <div style="font-size:34px;margin-bottom:8px;">🔐💜</div>
+    <h2>Only for my special person</h2>
+    <p>Enter the secret PIN to open your birthday surprise.</p>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="6" placeholder="••••" aria-label="Enter PIN">
+    <button class="pin-submit" id="pinSubmit">Unlock Surprise ✨</button>
+    <div id="pinError" aria-live="polite"></div>
+  </div>
+</div>
+
+<!-- ================= TOGETHER COUNTER (moved: shows right after PIN gate) ================= -->
+<section id="togetherCounter">
+  <span class="eyebrow-heart"></span>
+  <h2 class="section-title">Our Time Together</h2>
+  <p class="section-sub">Every day with you becomes another favorite memory.</p>
+  <div class="counter-card">
+    <div class="counter-number" id="daysTogether">0</div>
+    <div class="counter-label">days together ❤️</div>
+    <div class="counter-detail" id="togetherDetail"></div>
+  </div>
+</section>
+
+<canvas id="heartsCanvas"></canvas>
+<canvas id="confettiCanvas"></canvas>
+<!-- ================= HERO / OPENING ================= -->
+<section id="hero">
+  <div class="hero-frame">
+    <span class="hero-kicker">"Women" in love for Her Sahaayanae🫴🏻</span>
+    <h1 class="hero-title">Hey Birthday Man</h1>
+    <!-- ================= <span class="amp">🖤💋💜</span> ================= -->
+    <p class="hero-sub">I made a little surprise just for you dear...</p>
+    <button class="surprise-btn" id="openBtn">Open Your Surprise 💝</button>
+    <div class="scroll-hint">என்னவனுக்காக உன்னவள் தரும் பிறந்தநாள் வாழ்த்துகள்💖🎂</div>
+  </div>
+</section>
+<div id="story">
+  <!-- ================= STORY / TIMELINE ================= -->
+  <section id="ourStory">
+    <span class="eyebrow-heart reveal"></span>
+    <h2 class="section-title reveal">A Little Story About Us</h2>
+    <p class="section-sub reveal">Every love story is beautiful, but ours is the most my favorite. This birthday feels extra special to me because it's the first time I get to celebrate your birthday as your girlfriend, as your partner, as your pondati🖤💜</p>
+    <div class="timeline" id="timelineWrap"></div>
+  </section>
+  <!-- ================= GALLERY ================= -->
+  <section id="memories" style="background:#9CAF88;">
+    <span class="eyebrow-heart reveal"></span>
+    <h2 class="section-title reveal">Our Memories</h2>
+    <p class="section-sub reveal">A few of my favorite moments with you.</p>
+    <div class="gallery-grid reveal" id="galleryWrap"></div>
+  </section>
+  <!-- ================= REASONS ================= -->
+  <section id="reasons">
+    <span class="eyebrow-heart reveal"></span>
+    <h2 class="section-title reveal">Favorite habit from you😘</h2>
+    <p class="section-sub reveal">அப்படி என்ன செய்துவிட்டேன் நான் நீ என்னை இப்படி காதலிக்கிறாய்?🤷🏻‍♀️</p>
+    <div class="hearts-grid reveal" id="heartsWrap"></div>
+  </section>
+  <!-- ================= LETTER ================= -->
+  <section id="letter">
+    <span class="eyebrow-heart reveal"></span>
+    <h2 class="section-title reveal">A Message From My Heart</h2>
+    <div class="letter-paper reveal">
+      <div class="letter-text">Happy Birthday to my favorite ❤️
+
+I know life will become even more beautiful with you by my side. Thank you for being my partner, my happiness, my strength, and my safe place. I can't wait for all the memories we're going to create together. Every laugh, every adventure, every little moment, and every day we'll spend together will always be precious to me. I hope this new year of your life brings you everything your heart wishes for and opens the door to countless new blessings, happiness, and success. No matter where life takes us, I want us to keep walking side by side, creating beautiful memories, supporting each other through every challenge, celebrating every victory, and growing old together. I promise to love you, stand by you, and choose you today, tomorrow, and every day that follows.I love you more than words will ever be able to explain. Happy Birthday, my love. ❤️🎂
+To my mine🖤,
+Unga kitta naa 100% entha privacy um illaama irukkanum nu nenaikkuren nga... Because ennaala mudiyala naa unga kitta more times solla try pannirukken but ennaala mudiyala en nu therla enga neenga rempa kasta paduvingalo nu 🥺😔 itha na solla try pannathu neenga love panren nu soldrathukku munnadi i mean 3 years ku munnadi 😢 but vendam nu thonuchu.... Naa 2 years unga kitta pesama irunthen yaaru kittaiyum avlova pesa pidikkaathu.... Neenga yean nu enkitta ithuvara kettathu illa but solli feel pannirukkinga antha time la rempa kasta patten nu sonninga😔. But athukku reason um neenga thaan.... Ama nga unga nallathuku thaan naa unkitta pesaama irunthen ennaala ethuvum Ungalukku entha problem um vara kudaathu nu nenachen athu naala thaan avoid pannen.... Crt ah ennoda Gandhi periyamma death oda 30 naal kadal ku poga neenga 3 perum vanthu kelambuninga oru room la anga Naanum thoongittu irunthen sound kettuchu but sariya therla naa paakkavum illa, neenga ponathukku apram enga vellaiyamma periyamma irunthaanga avunga kitta ketten, (kalai machan ah theriyum but unga rendu peraiyum theriyaathu, innum rendu Machan irukkaanga nu theriyum but paathathu illa) appo thaan avunga sonnaanga periya mama pasanga nu apram naa kandukkala vittutten.... Apram Ennoda akka sadangu function appo thaan Enakku vivaram therinchu naa ungala 1st time paathen, neenga varum pothu aarathi kuda enna edukka sonnaanga naa vekka pattutte eduthen 🙃 appola irunthu Enakku ungala pudikkum but athu ariyaatha vayasu... Appo la irunthu neenga eppo enga v2ku vanthaalum ungala naa nerla face pannave maatten athu oru bayam oru happy oru feel enna nu solla therla.... Apdiye poittu irunthuchu.... Appo thaan na age attend pannen 10th christmas appo antha time la neenga maala pottu irunthinga antha time phone la neenga konjam text pannuvinga Naanum pesuven same time dharshini kitta neenga nalla pesuvinga.... Ennoda thanni oothura function ku neenga vara mudiyala appove Enakku oru maathiri kastama irunthuchu but apdiye vittutten.... Oru naal amma oru katha sonnaanga " Krishnar oda rasi natchathiram ellaame unakkum same thaan... Krishnar avunga mama kamsar ah koldrathukku thaan piravi eduppaaru... Athunaala intha rasi natchathiram iruntha thai maman ku aagathu nu sonnaanga" Athukku apram oru naal "Naa rempa chinna pullaiya irukkum pothu ammatchi mudiyaama iruntha appo poii paathena appo avunga la kuptu one month kulla avunga eranthu poittaangalaam apram konjam naal la mama eranthu poittaangalaam😔" avunga sonna rendu story um sync aachu nga 😓 ennaala thaan pola nu eduthukitten same time naa age attend pannathukku vere unga v2la irunthu vara mudiyalaiya so confirm eh pannitten naanthaan problem nu.....😔 
+Apram neenga dharshini kitta thaan pesuvinga so neenga avala love panringa nu vera nenachen.... Apram Ennoda sadangu ku vanthinga pudikkum ungala but avunga love panraanga ithu thappu nu naane en manasukku eduthu sollikittu accept pannitten.... Apram normal ahh thaan irunthen... Appo thaan 11th leave 3 months thaan school ponom antha time la.... enkooda 10th padicha paiyan brother thaan Venum avan Alagappa polytechnic la padichittu irunthaan... Appo enga school la padicha ellaarum oru group create panni pesunom... Itha avanoda friend oru paiyan paathu athula irunthu ennoda number eduthu Enakku message pannaan naa paathuttu reply pannala apram Avan naa unga kuda padicha paiyanoda friend thaan bayapdaathinga nu sonnaan naa nambave illa apram thaan picture send pannaan appo nambunen... Apram ivan kitta ketten Avan yaaru nu en friend thaan nu sonnaan seri nu vitten Avan nalla paiyan thaan ennoda number ah en permission illaama eduthu message pannathu Enakku pidikkave illa... Avana school pogum pothu oru 2 times paathu iruppen muslim paiyan avan... Apram pesuvaan 12th la oru july la oru naal Naa ungala love panren nu msg pannaan but Enakku paathuttu semma shock Ennada ivan namma friend ah thaane pesinom ipdi advantage eduthukittaane nu nenachen.... Enakku antha paiyana pidikkum but life partner antha alavuku laam yosikkala but summa flames pottu paappen dairy heart pottu paappen antha time konjam butterfly vanthathu... Antha paiyan kitta naa sollala but friend ah thaan continue pannen because reality ah yosikkanum la.... Apram naa hostel poitten antha paiyan kitta pesurathu illa but enmela thaanga thappu naa pesuna naala thaan antha paiyan um pesunan naanthaan thevai illaama hope kuduthutten.... Ithukku apram naa v2ku vanthuttu pesunen antha time la manish paathuttu akka kitta sollittaan then dairy la thaan flames pottu varuchurunthen oru kavithai kuda eluthi iruppen atha akka paathutta... Apram enkitta vanthu pesuna... Ennathu ithellam nee ipdi pannittiye unna naa epdi nenachu irunthen but nee ipdi irukka ithellam namma family ku set aagathu appa va nenachu paathiya nu akka avlo advice panna apram thaan naa realise pannen ithellam age problem namakku carrer thaan mukkiyam nu... Enna thittuttu irukkum pothu thaan akka sonna "already naane intha maathiri oru situation la patta paadu pothaatha nu" Enakku shock aagiruchu ivalum Nagaraj Machan um thaane love panraanga nu itha naa avankittaiye ketten... Neethaan machan ah love panriye apram enna problem nu... Appo thaan unmaiya sonna naa jeeva machan ah thaan love pannen one sided ah but Avan accept pannala Avan vera oru ponna love panraan Nagaraj Machan friend ah thaan pesuvaanga avungalukku intha visayam theriyum nu... 
+Enakku enna soldrathu nu therla kalla eduthu mandaila potta maathiri irunthuchu... Ivlo naal thappa purinchu vachurukkom nu 😓 apram Enakku rempa guilty ahh feel aagiruchunga... So naa ellaathaiyum avoid panna start pannen.... Antha time la thaan amma appa ku accident... Appo thaan neenga bike la kuptu vanthinga appolaam enna soldrathu nu therla... Naane antha guilt ah normal pannikkitten apram naa 1st sem la thaan pesunen unga kitta... Apram Enakku kastam aagiruchu ivlo thappaiyum pannittu epdi ipdi free ya pesurom nu 😔 so athula irunthu thaan naa ungala avoid panna start pannen.... Naa avoid panren nu therinchum neenga enkitta pesa try pannittu thaan irunthinga... Athu innum pain ah irunthuchu appo thaan en roommate kitta sonnen appo thaan Ava sonna, love panren nu sollu avunga stop pannidivaanga nu athaan naa apdi pannen.... Apram manasu kekkaama unga kittaiye sollitten nga.... Apram Enakku 2nd year la thaan balesh ah theriyum appo thaan Avan Friend aanan... Rempa childish ah iruppaan vegulu nu solluvaangala antha maathiri actually final year la  Avan thaan enga volleyball captain appo mature aagittaan... Avan kittaiyum sollirukken intha maathiri Ennoda mama paiyan irukkaanga avunga enna love panraangalo nu nenaikkuren ella kathaiyum um sonnen... Nee porumaiya iru enna nadakkuthu nu paaru unga v2la enna soldraangalo atha pannu nu sonnaan...
+Avanukku ennana naa nalla irukkanum nga entha feel um panna kudaathu Enakku ethu nallatho atha mattum thaan pannuvaan.... Haa innonu actually enga rendu peraiyum ellaarum naa love panrom nu thaan nenaippaanga eventually en friends um naa pala thadava sollirukken Avan ennoda best friend athoda antha maathiri naanga nenachathu kuda illa nu but ithu ellaathukkum enga game thaanga reason 🤦🏻‍♀️ enga game la boys and girls pesa kudaathu rules but balesh.... mech dept la oru ponnu irukka ava en friend avaloda friend thaan balesh... So ipdi thaan therinchu Friend.... Enga game la suppose boys and girls pesunaale ipdi katha katti vitruvaanunga... Naanga Athellam kandukka maattom because true ahh friends aagittom rules and regulations ah laam paakka mudiyuma... Actually coimbatore pona appo kuda manish vanthaan appo avanukku thonaiya pechukku thaan balesh ah vara sonnen avanum naa kupten nu oru vaarthaikku vanthaan annaikku Avan birthday vera sanda adichikitti isha la thaan samaathanam aanom 🤦🏻‍♀️ apdi sanda poduvom manish kitta Venum naalum kelungalae Avan thaan solve pannaan  coimbatore la... Then ithaanga antha 3 years la nadanthathu... 
+Enakku sollanum sollanum nu thonum but situation set aagathu then enga unga carrer la focus pannaama poiruvingalo nu 😔 Neenga love panringa nu theriyum but ivlo love panringa nu 1% kuda expect pannala nga 🥺😔 Actually naa worth ehh illainga 😞 Oru time la naa ungala avlo veruthen, but ippo athukku infinity ahh love panren nga 🥺🥺 Enna avoid mattum panniraathinga 😞 Ungala Enakku pidikkum thaan but neenga appo laam enga akka kitta thaan pesuvinga antha time rempa veruthen... But athu eppo love ahh maaruchunu therla nga 🥺😔 But oru naal dharshini enkitta sollirukka nga.. Nagaraj Machan unna love panraanga pola nu... But naa nambave illa because ungalukku love panrathe pidikkaathu ithula epdi neenga love pannuvinga Athuvum enna poii epdi nu nenachen but naa nenachathu eppavume thappa thaane aagirukku🥹 Neraiya kanavu irukkunga 🥺 But naa ethukkume worth illainu theriyum nga.... Naa evlo thaan ungala love pannaalum neenga panra love ku ♾️ eppavum kammiya thaanga irukkum antha alavuku neenga love vachurukkinga enmela 🥹🥺
+Then,
+I'm a woman who easily cries. If one day I accidentally make you angry, please don't ignore me or leave me guessing what I did wrong. Silence hurts me more than you may realize. When your anger begins to settle, please look at me gently, lower the tone of your voice, and hold me close. Let me cry over my mistakes in your arms, knowing I'm still safe with you. Instead of making me feel defeated or drowning me in guilt, please talk to me with kindness. Tell me where I went wrong, help me understand my mistakes, and guide me so I can grow and not repeat them. I don't need harsh words—I need your patience, your honesty, and your gentle guidance. I promise to listen, to learn, and to become a better partner with you. All I ask is that we choose understanding over silence, and love over anger.
+
+
+</div>
+      <div class="letter-sign script">Happy Birthday, my love. ❤️</div>
+    </div>
+  </section>
+
+  <!-- ================= FINALE ================= -->
+  <section id="finale">
+    <span class="eyebrow-heart reveal">🎁</span>
+    <h2 class="section-title reveal">Wait… there's one more thing.</h2>
+    <p class="section-sub reveal">I saved my favorite part for last.</p>
+    <button class="finale-btn reveal" id="finaleBtn">Click for your final surprise ❤️</button>
+  </section>
+
+  <footer>made with all my love, for you — always ❤️</footer>
+</div>
+
+<!-- lightbox -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <img class="lightbox-img" id="lightboxImg" alt="">
+    <div class="lightbox-cap" id="lightboxCap"></div>
+  </div>
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">✕</button>
+</div>
+
+<!-- fullscreen finale -->
+<div class="fullscreen-finale" id="fsFinale">
+  <div class="fx-inner">
+    <span class="script">If I could choose my person all over again, I would still choose YOU ❤️</span>
+    <div class="fx-frame">
+      <img src="photos/NV.png" alt="Us" onerror="this.parentElement.innerHTML='<div class=fx-ph><span class=big>🤍</span>add photo: photos/NV.png</div>'">
+    </div>
+    <p class="small">Happy Birthday, Dear 🥹🫂</p>
+    <p class="small">My love. My best friend. My forever.</p>
+    <p class="small">Him yesterday. Him today. Him tomorrow. Him always❤️</p>
+    <p class="small">முகம் பார்க்க தவிக்கிறேன் என் இனிய பூங்காற்றே🥹🖤</p>
+    <button class="fx-close" id="fsClose">close, but keep this in your heart</button>
+  </div>
+</div>
+
+<!-- music -->
+<audio id="bgAudio" loop preload="none">
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+<div id="musicHint">turn sound on 🎵</div>
+<button id="musicToggle" aria-label="Play music">🖤</button>
+
+<script>
+/* =========================================================
+   EDIT YOUR CONTENT HERE
+   ========================================================= */
+
+// ---- TIMELINE DATA ----
+// photo: filename inside your "photos" folder (or leave "" for a placeholder)
+const TIMELINE = [
+  { date:"The day we met",        title:"Where it all began",     caption:"Actually enakku vevaram therinchu namma 1st meet pannathu enga akka sadangu function la thaan nu nenaikkuren🤩 Naa kuda aarathi eduthen nga neenga kuda enna kalaiyichinga but enakku sariya niyabagam illa neenga enna sonninga nu🫣", photo:"14.jpg" },
+  { date:"Our first memory",      title:"A moment I'll never forget", caption:"Neraiya irukku nga but ketta udane soldrathu Namma first time bike la ponathu athaavathu hospital la irunthu v2ku vanthom rendu peru mattum that is my unforgettable memories nga because namma appo thaan avlo pesave start pannom... naa kuda expect pannave illainga but enakku rempa bayama irunthuchu nga but oru comfortzone unga kitta irunthu feel pannen🫂 Then enga suba akka marriage nga🫣", photo:"2.jpg" },
+  { date:"Our favorite Kutty Trip",     title:"Wanderers, together",    caption:"Sollava venum🫣 Namma 2nd time bike la ponathu I mean laptop vaanga🤩 Athellaam oru feel nga manasukku pudivanoda bike la pogum pothey avanukku theriyaama sight adikkurathulaam🫣", photo:"12.jpg" },
+  { date:"A funny memory",        title:"The one that makes us laugh🤗", caption:"Vera enna maaththi maaththi roat pannikkirathu thaan😁", photo:"13.jpg" },
+  { date:"Our most beautiful moment", title:"A moment I hold close", caption:"That is priceless nga🥹🫂Because neenga oorukku pora annaikku ella work irunthum enna kupda enga veettukku vanthinga... Vanthathu mattum illaama maadikku vanthu enna sight vera adichinga🫣but antha time la enakku ethuvume thonala apram thaan realize pannen ellaame🥹🫂", photo:"IMG_20260910_194946.jpg" },
+  { date:"Today❤️",              title:"Still choosing you",      caption:"And every day after this one, too. விழியால் தொட்ட அழகே... இந்த ஆசை மாறாதே..! 🥹❤️✨", photo:"15.jpg" },
+];
+
+// ---- GALLERY DATA ----
+const GALLERY = [
+  { photo:"7.jpg", caption:"His success🥹 Her dream🫂" },
+  { photo:"6.jpg", caption:"Our Dream nga...🤗" },
+  { photo:"5.jpg", caption:"Guruvayoor la enda kalyaanam kalikkum🤗" },
+  { photo:"8.jpg", caption:"Transition from Hate to Love... Ever GEETHA deserves his GOVINDHAM😍" },
+  { photo:"3.jpg", caption:"Sometimes these movies are created for us🥹" },
+  { photo:"11.jpg", caption:"I didn't beleive in love, but u proof me it's wrong🥹😭🫂" },
+  { photo:"4.jpg", caption:"Namma side function ku varathey neenga varuvinga nu thaanga sight adikkalaam la🫣 En Kannu ungala thaan thedum but yaarukkum theriyaatha maathiri control panni vachuppen🤭 neenga antha place la irukkingala nu paatha thaan Enakku satisfied aagum🙃 apdi thaan oru naal kesavan machan marrige ku vanthen, enga v2la Enna thaan poga sonnaanga neenga vavuvinga nu Naanum vanthen, but paatha neenga varave illa last la thaan vathinga... Vanthum kandukkave illa neenga😤 semma kovama aagiruchu... apram thaan aththa sonnaanga ungalukku odampu mudiyala nu... Apram atha vittutten I did understand🙂" },
+  { photo:"10.jpg", caption:"I will always choose you only you, whether you are with me or not. Nothing is special without you nga" },
+  { photo:"1.jpg", caption:"We will walk hand in hand, create countless memories, and build a beautiful life together❤️🌸" },
+];
+
+// ---- REASONS DATA (10+) ----
+const REASONS = [
+  "You always make me smile.I don't know the answer, why?",
+  "Having a person who says 'Yaaru enna sonnaalum paravailla Naan unna namburen' is a different kinda varamnga..!",
+  "Because you complete me🥹",
+  "Admiring HIM when he is talking with me is my favourite job - whwn do you konw(namma chicken rice sapdum pothu)",
+  "Be less judgement, more understanding",
+  "Gentleman who would never raise his voice at me and baby's me no matter what and deal my tantrums in left hand🫂",
+  "I heared him to said 'Un kangalil neer sindhinaal appothey sethu pogiren...!'",
+  "Love is not about who come first. It's all about who waits and never leaves.'the right person already be arround you, only times decides when your story begins' - favourite saying nga",
+  "Evlo naa avoid panniyum, you did not leave me😭",
+  "I never planned to fall in love, but ippo <Avana maathirilaam innoruthan kidaikka maattaan nga😭🤌🏻>",
+  "I gave you 100+ reasons to walk away from me, but you already have 1000+ reasons to love me🌚🥹  ",
+  "Naa ungaloda love ku worth eh illanaalum, enna princess maathiri paakkuringa naa enna thaanga pannen ungala enmela ivlo love vachurukkinga🥹 Now, Your love means everything to me....",
+];
+
+// ---- NEW FEATURES SETTINGS ----
+// Change these values to your real details. Date format: YYYY-MM-DD
+const SECRET_PIN = "0612";
+const RELATIONSHIP_START_DATE = "2026-08-15";
+
+
+/* =========================================================
+   PIN GATE
+   ========================================================= */
+const pinGate = document.getElementById('pinGate');
+const pinInput = document.getElementById('pinInput');
+const pinSubmit = document.getElementById('pinSubmit');
+const pinError = document.getElementById('pinError');
+
+function unlockSite(){
+  if(pinInput.value === SECRET_PIN){
+    pinError.textContent = '';
+    pinGate.style.opacity = '0';
+    pinGate.style.transition = 'opacity .45s ease';
+    setTimeout(()=>{ pinGate.style.display = 'none'; }, 450);
+  } else {
+    pinError.textContent = 'That PIN is not the one 😌 Try again.';
+    pinInput.value = '';
+    pinInput.focus();
+  }
+}
+pinSubmit.addEventListener('click', unlockSite);
+pinInput.addEventListener('keydown', e=>{ if(e.key === 'Enter') unlockSite(); });
+
+/* =========================================================
+   DAYS TOGETHER COUNTER
+   ========================================================= */
+function updateTogetherCounter(){
+  const start = new Date(RELATIONSHIP_START_DATE + 'T00:00:00');
+  const now = new Date();
+  const diff = Math.max(0, now - start);
+  const days = Math.floor(diff / 86400000);
+  document.getElementById('daysTogether').textContent = days.toLocaleString();
+
+  let years = now.getFullYear() - start.getFullYear();
+  let months = now.getMonth() - start.getMonth();
+  let dayDiff = now.getDate() - start.getDate();
+  if(dayDiff < 0){ months--; const prev = new Date(now.getFullYear(), now.getMonth(), 0).getDate(); dayDiff += prev; }
+  if(months < 0){ years--; months += 12; }
+  document.getElementById('togetherDetail').textContent = `${years} year${years===1?'':'s'}, ${months} month${months===1?'':'s'} and ${dayDiff} day${dayDiff===1?'':'s'} of us ✨`;
+}
+updateTogetherCounter();
+setInterval(updateTogetherCounter, 60000);
+
+/* =========================================================
+   RENDER TIMELINE
+   ========================================================= */
+const timelineWrap = document.getElementById('timelineWrap');
+TIMELINE.forEach(item=>{
+  const el = document.createElement('div');
+  el.className = 'tl-item reveal';
+  el.innerHTML = `
+    <span class="tl-dot">❤</span>
+    <div class="tl-card">
+      <span class="tl-date">${item.date}</span>
+      <h3>${item.title}</h3>
+      <p>${item.caption}</p>
+      <div class="frame">
+        ${item.photo ? `<img src="photos/${item.photo}" alt="${item.title}" onerror="this.parentElement.innerHTML='<div class=ph><span class=big>....</span>add photo: photos/${item.photo}</div>'">` : `<div class="ph"><span class="big">🤍</span>add a photo here</div>`}
+      </div>
+    </div>`;
+  timelineWrap.appendChild(el);
+});
+
+/* =========================================================
+   RENDER GALLERY
+   ========================================================= */
+const galleryWrap = document.getElementById('galleryWrap');
+GALLERY.forEach((item, i)=>{
+  const btn = document.createElement('button');
+  btn.className = 'g-item';
+  btn.setAttribute('aria-label','Open photo');
+  btn.innerHTML = `
+    ${item.photo ? `<img src="photos/${item.photo}" alt="${item.caption}" onerror="this.parentElement.querySelector('.g-fallback')?.remove();this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\\'ph g-fallback\\'></div>')">` : `<div class="ph"></div>`}
+    <div class="g-cap">${item.caption}</div>`;
+  btn.addEventListener('click', ()=> openLightbox(item));
+  galleryWrap.appendChild(btn);
+});
+
+function openLightbox(item){
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  const cap = document.getElementById('lightboxCap');
+  if(item.photo){
+    img.src = 'photos/' + item.photo;
+    img.onerror = ()=>{ img.removeAttribute('src'); };
+  } else {
+    img.removeAttribute('src');
+  }
+  cap.textContent = item.caption;
+  lb.classList.add('open');
+}
+document.getElementById('lightboxClose').addEventListener('click', ()=>{
+  document.getElementById('lightbox').classList.remove('open');
+});
+document.getElementById('lightbox').addEventListener('click', (e)=>{
+  if(e.target.id === 'lightbox') e.currentTarget.classList.remove('open');
+});
+
+/* =========================================================
+   RENDER REASON HEARTS
+   ========================================================= */
+const heartsWrap = document.getElementById('heartsWrap');
+REASONS.forEach((reason, i)=>{
+  const card = document.createElement('div');
+  card.className = 'heart-card';
+  card.innerHTML = `
+    <div class="heart-inner">
+      <div class="heart-face heart-front">
+        <span class="num">${String(i+1).padStart(2,'0')}</span>
+        <span class="icon">💗</span>
+      </div>
+      <div class="heart-face heart-back">${reason}</div>
+    </div>`;
+  card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  heartsWrap.appendChild(card);
+});
+
+/* =========================================================
+   OPEN SURPRISE (hero -> story)
+   ========================================================= */
+const openBtn = document.getElementById('openBtn');
+const story = document.getElementById('story');
+openBtn.addEventListener('click', ()=>{
+  burstConfetti(70);
+  openBtn.disabled = true;
+  setTimeout(()=>{
+    story.classList.add('show');
+    document.getElementById('hero').style.minHeight = 'auto';
+    document.getElementById('ourStory').scrollIntoView({behavior:'smooth'});
+    initReveal();
+  }, 500);
+});
+
+/* =========================================================
+   SCROLL REVEAL
+   ========================================================= */
+function initReveal(){
+  const targets = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){ en.target.classList.add('is-visible'); io.unobserve(en.target); }
+    });
+  }, { threshold:0.12 });
+  targets.forEach(t=> io.observe(t));
+}
+
+/* =========================================================
+   FINAL SURPRISE
+   ========================================================= */
+document.getElementById('finaleBtn').addEventListener('click', ()=>{
+  document.getElementById('fsFinale').classList.add('open');
+  burstConfetti(140);
+});
+document.getElementById('fsClose').addEventListener('click', ()=>{
+  document.getElementById('fsFinale').classList.remove('open');
+});
+
+/* =========================================================
+   BACKGROUND MUSIC
+   ========================================================= */
+const audio = document.getElementById('bgAudio');
+const musicToggle = document.getElementById('musicToggle');
+const musicHint = document.getElementById('musicHint');
+let musicReady = false;
+let musicPlaying = false;
+
+audio.addEventListener('canplaythrough', ()=>{
+  if(!musicReady){
+    musicReady = true;
+    musicToggle.classList.add('ready');
+    musicHint.classList.add('show');
+    setTimeout(()=> musicHint.classList.remove('show'), 4500);
+  }
+});
+audio.addEventListener('error', ()=>{ /* no song.mp3 provided yet: stay hidden, no error shown */ });
+audio.load();
+
+musicToggle.addEventListener('click', ()=>{
+  if(musicPlaying){
+    audio.pause();
+    musicToggle.textContent = '▶';
+  } else {
+    audio.play().catch(()=>{});
+    musicToggle.textContent = '❚❚';
+  }
+  musicPlaying = !musicPlaying;
+  musicHint.classList.remove('show');
+});
+
+/* =========================================================
+   FLOATING HEARTS (ambient background)
+   ========================================================= */
+(function floatingHearts(){
+  const canvas = document.getElementById('heartsCanvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const COUNT = window.innerWidth < 600 ? 10 : 16;
+  for(let i=0;i<COUNT;i++){
+    particles.push(makeHeart());
+  }
+  function makeHeart(){
+    return {
+      x: Math.random()*w,
+      y: h + Math.random()*h,
+      size: 8 + Math.random()*14,
+      speed: 0.25 + Math.random()*0.5,
+      drift: (Math.random()-0.5)*0.4,
+      sway: Math.random()*Math.PI*2,
+      opacity: 0.15 + Math.random()*0.25,
+      color: Math.random() > 0.5 ? '#8B5FA8' : '#C9A961'
+    };
+  }
+  function drawHeart(p){
+    ctx.save();
+    ctx.globalAlpha = p.opacity;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(Math.sin(p.sway)*0.15);
+    const s = p.size/16;
+    ctx.beginPath();
+    ctx.fillStyle = p.color;
+    ctx.moveTo(0, 4*s);
+    ctx.bezierCurveTo(-8*s, -4*s, -16*s, 4*s, 0, 16*s);
+    ctx.bezierCurveTo(16*s, 4*s, 8*s, -4*s, 0, 4*s);
+    ctx.fill();
+    ctx.restore();
+  }
+  function tick(){
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p=>{
+      p.y -= p.speed;
+      p.x += p.drift;
+      p.sway += 0.02;
+      if(p.y < -20){ Object.assign(p, makeHeart(), {y: h+20}); }
+      drawHeart(p);
+    });
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+/* =========================================================
+   CONFETTI BURST
+   ========================================================= */
+function burstConfetti(count){
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = ['#8B5FA8','#C9A961','#3D1F5C','#E6DBF0','#ffffff'];
+  const pieces = [];
+  for(let i=0;i<count;i++){
+    pieces.push({
+      x: canvas.width/2 + (Math.random()-0.5)*80,
+      y: canvas.height*0.35,
+      vx: (Math.random()-0.5)*10,
+      vy: -Math.random()*9 - 3,
+      size: 5 + Math.random()*6,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*Math.PI,
+      vr: (Math.random()-0.5)*0.3,
+      heart: Math.random() > 0.6,
+      life: 0
+    });
+  }
+  let frame = 0;
+  function loop(){
+    frame++;
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    let alive = false;
+    pieces.forEach(p=>{
+      p.vy += 0.18;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life++;
+      if(p.y < canvas.height + 30) alive = true;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.max(0, 1 - p.life/140);
+      ctx.fillStyle = p.color;
+      if(p.heart){
+        const s = p.size/10;
+        ctx.beginPath();
+        ctx.moveTo(0, 2*s);
+        ctx.bezierCurveTo(-5*s,-3*s,-10*s,2*s,0,9*s);
+        ctx.bezierCurveTo(10*s,2*s,5*s,-3*s,0,2*s);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+      }
+      ctx.restore();
+    });
+    if(alive && frame < 220){
+      requestAnimationFrame(loop);
+    } else {
+      ctx.clearRect(0,0,canvas.width, canvas.height);
+    }
+  }
+  loop();
+}
+window.addEventListener('resize', ()=>{
+  const c = document.getElementById('confettiCanvas');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+});
+</script>
+</body>
+</html>
